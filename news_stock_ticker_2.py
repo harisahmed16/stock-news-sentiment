@@ -26,16 +26,19 @@ def fetch_news_headlines(query):
 def get_classifier():
     return pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
 
-def analyze_sentiment(headlines, classifier):
-    sentiments = classifier(headlines)
-    pos, neg = [], []
+from textblob import TextBlob
 
-    for h, s in zip(headlines, sentiments):
-        if s["label"] == "POSITIVE":
-            pos.append(h)
+def analyze_sentiment(headlines):
+    positive = []
+    negative = []
+
+    for headline in headlines:
+        polarity = TextBlob(headline).sentiment.polarity
+        if polarity >= 0.1:
+            positive.append(headline)
         else:
-            neg.append(h)
-    return pos, neg
+            negative.append(headline)
+    return positive, negative
 
 def plot_chart(positive, negative):
     fig, ax = plt.subplots()
