@@ -16,11 +16,11 @@ def fetch_news_headlines(query):
         f"https://newsapi.org/v2/everything?"
         f"q={query}&language=en&sortBy=publishedAt&pageSize=10&apiKey={NEWS_API_KEY}"
     )
-    response = requests.get(url)
-    
-    if response.status_code != 200:
-        st.error(f"❌ Failed to fetch news. Status code: {response.status_code}")
-        st.code(response.text, language="json")
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        st.error(f"❌ Failed to fetch news: {e}")
         return []
 
     data = response.json()
